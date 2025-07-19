@@ -1,10 +1,11 @@
-import conf from "../conf/conf";
+import conf from "../conf/conf.js";
 import { Client, Account, ID } from "appwrite";
 
 export class AuthService{
 client= new Client();
 account;
 constructor() {
+    
    this.client
         .setEndpoint(conf.appwriteUrl)
         .setProject(conf.appwriteProjectId);
@@ -35,13 +36,18 @@ async login({email,password}){
     }
 }
 
+
 async getCurrentUser(){
     try {
-        return this.account.get();
+        return await this.account.get();
     } catch (error) {
-        throw error;
+        // If unauthorized, return null (user not logged in)
+        if (error && error.code === 401) {
+            return null;
+        }
+        console.log("Error getting current user:", error);
+        return null;
     }
-    return null;
 }
 
 async logout(){

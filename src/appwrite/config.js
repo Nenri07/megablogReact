@@ -82,7 +82,7 @@ export class Service{
 
    async getPosts(queries=[Query.equal("status", "active")]){
     try {
-        this.databases.listDocuments(
+        return await this.databases.listDocuments(
             conf.appwriteDatabaseId,
             conf.appwriteCollectionId,
             queries
@@ -112,7 +112,7 @@ export class Service{
 
    async deleteFile(fileId){
     try {
-        return await this.bucket.deleteFile(
+        await this.bucket.deleteFile(
             conf.appwriteBucketId,
             fileId
         );
