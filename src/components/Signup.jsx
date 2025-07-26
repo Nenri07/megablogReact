@@ -82,7 +82,7 @@ function Signup() {
                         })}
                       />     
 
-                      <Button className='w-full' type='submit'>
+                      <Button className='w-full bg-black ' type='submit'>
                         Create Account
                     </Button>              
 

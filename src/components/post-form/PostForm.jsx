@@ -1,23 +1,23 @@
-import React, { use, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
-import { RTE,Select,Button ,Input} from './index'
+import { RTE,Select,Button ,Input} from '../index'
 import appwriteService from '../../appwrite/config'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 
 function PostForm({post}) {
-    const {register,handleSubmit,control,watch,setValue,getValues}=useForm({
-        defaultValues:{
-            title:post? post.title:"",
-            slug:post?post.slug:"",
-            featuredImage:post?post.featuredImage:"",
-            content:post?post.content:"",
-            status:post?post.status:""
-        }
+     const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
+        defaultValues: {
+            title: post?.title || "",
+            slug: post?.$id || "",
+            content: post?.content || "",
+            status: post?.status || "active",
+        },
     });
     const navigate = useNavigate();
-    const userData= useSelector((state)=>state.user.userData)
+    const userData= useSelector((state)=>state.auth.userData)
+    
 
 
     const submit= async (data)=>{
@@ -32,6 +32,9 @@ function PostForm({post}) {
           ...data,
           featuredImage: file ? file.$id : undefined,
         })
+
+        console.log("Updated Post:", updatedPost);
+        
 
         if(updatedPost){
           navigate(`/post/${updatedPost.$id}`)
@@ -51,6 +54,8 @@ function PostForm({post}) {
             ...data,
             userId:userData.$id,
           })
+          console.log(newPost);
+          
           if(newPost){
             navigate(`/post/${newPost.$id}`)
 
@@ -58,27 +63,28 @@ function PostForm({post}) {
     }
   }
 
-    const slugTransform= useCallback((value)=>{
-      if(value)
-        return value
-      .trim()
-      .toLowerCase()
-      .replace(/^[a-zA-Z\d\s]+/g ,'-')
-      .replace(/\s+/g,'-')
-      return ''
-    },[])
+    const slugTransform = useCallback((value) => {
+        if (value && typeof value === "string")
+            return value
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-zA-Z\d\s]+/g, "-")
+                .replace(/\s/g, "-");
 
-    React.useEffect(()=>{
-      const subcscription = watch((value,{name})=>{
-        if(name==='title'){
-          const slug= slugTransform(value.title,{shouldValidate: true})
-          setValue('slug',slug)
-        }
-      })
-      return ()=>{
-        PushSubscription.unsubscribe()
-      }
-    },[watch,setValue,slugTransform])
+        return "";
+    }, []);
+
+    
+
+     React.useEffect(() => {
+        const subscription = watch((value, { name }) => {
+            if (name === "title") {
+                setValue("slug", slugTransform(value.title), { shouldValidate: true });
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [watch, slugTransform, setValue]);
 
     return (
         <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
@@ -123,7 +129,8 @@ function PostForm({post}) {
                     className="mb-4"
                     {...register("status", { required: true })}
                 />
-                <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
+                <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full bg-black" 
+                >
                     {post ? "Update" : "Submit"}
                 </Button>
             </div>

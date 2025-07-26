@@ -13,7 +13,7 @@ function Login() {
 
     const login= async (data)=>{
         try {
-            error="";
+            setError("");
             const session= await authService.login(data);
             if(session){
                const userData= await authService.getCurrentUser();
@@ -77,7 +77,7 @@ function Login() {
                 })} />
                 <Button
                 type='submit'
-                className='w-full'
+                className='w-full bg-black'
                 bgColor='bg-black-500'
                 > Sign In</Button>
             </div>

@@ -14,7 +14,7 @@ export class Service{
     }  
    async createPost({title, slug, featuredImage,content,userId, status}){
     try {
-        await this.databases.createDocument(
+      return  await this.databases.createDocument(
             conf.appwriteDatabaseId,
             conf.appwriteCollectionId,
             slug,
@@ -26,6 +26,7 @@ export class Service{
                 status
             }
         )
+        
     } catch (error) {
         console.log("Error creating post:", error);
         
@@ -34,7 +35,7 @@ export class Service{
    
    async updatePost(slug,{title, featuredImage,content, status}){
     try {
-        await this.databases.updateDocument(
+        const updated=await this.databases.updateDocument(
             conf.appwriteDatabaseId,
             conf.appwriteCollectionId,
             slug,
@@ -45,6 +46,7 @@ export class Service{
                 status
             }
         )
+        return updated;
     } catch (error) {
         console.log("Error updating post:", error);
         
@@ -126,7 +128,8 @@ export class Service{
     
    getfilePreview(fileId){
     try {
-        return this.bucket.getFilePreview(
+        
+        return this.bucket.getFileView(
             conf.appwriteBucketId,
             fileId
         );
